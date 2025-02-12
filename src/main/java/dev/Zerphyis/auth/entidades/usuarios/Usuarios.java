@@ -1,12 +1,15 @@
 package dev.Zerphyis.auth.entidades.usuarios;
 
 import dev.Zerphyis.auth.Dtos.DadosUsuarios;
+import dev.Zerphyis.auth.entidades.perfil.Perfil;
+import dev.Zerphyis.auth.entidades.registroLogin.RegistroLogin;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_usuarios")
@@ -23,6 +26,10 @@ public class Usuarios {
 
     private LocalDateTime ultimoAcesso;
     private Boolean status;
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<RegistroLogin> registrosLogin;
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private Perfil perfil;
 
 
     public Usuarios(){
