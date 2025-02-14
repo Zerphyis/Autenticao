@@ -3,6 +3,7 @@ package dev.Zerphyis.auth.entidades.usuarios;
 import dev.Zerphyis.auth.Dtos.DadosUsuarios;
 import dev.Zerphyis.auth.entidades.perfil.Perfil;
 import dev.Zerphyis.auth.entidades.registroLogin.RegistroLogin;
+import dev.Zerphyis.auth.entidades.senha.Senha;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,8 @@ public class Usuarios {
     @NotBlank
     private  String nome;
     @NotBlank
+    private  String email;
+    @NotBlank
     private  String senha;
 
     private LocalDateTime dataCriada;
@@ -32,15 +35,26 @@ public class Usuarios {
     private Perfil perfil;
 
 
+
     public Usuarios(){
 
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public Usuarios(DadosUsuarios dados){
         this.nome= dados.nome();
+        this.email=dados.email();
         this.senha= dados.senha();
         this.dataCriada=LocalDateTime.now();
         this.status=true;
+        this.ultimoAcesso=dataCriada.plusHours(5);
 
     }
 

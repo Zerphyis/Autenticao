@@ -22,6 +22,7 @@ public class ServiceUsuarios {
                 .orElseThrow(() -> new RuntimeException("Usuário com id fornecido não encontrado"));
 
         usuario.setNome(dados.nome());
+        usuario.setEmail(dados.email());
         usuario.setSenha(dados.senha());
 
         return repository.save(usuario);
@@ -45,8 +46,5 @@ public class ServiceUsuarios {
         repository.save(usuario);
        return usuario.getStatus();
     }
-
-
-
 
 }
