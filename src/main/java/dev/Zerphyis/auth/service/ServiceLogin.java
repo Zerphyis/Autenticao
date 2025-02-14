@@ -20,11 +20,11 @@ public class ServiceLogin implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Login user = repository.findByEmail(username);
+        Login user = (Login) repository.findByEmail(username);
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getSenha(),
+                user.getUsername(),
+                user.getPassword(),
                 user.getAuthorities()
         );
     }
