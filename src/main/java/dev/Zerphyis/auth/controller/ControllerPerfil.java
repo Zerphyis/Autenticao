@@ -10,23 +10,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/perfil")
+@RequestMapping("/home")
 public class ControllerPerfil {
 
     @Autowired
-    private ServicePerfil servicePerfil;
+     ServicePerfil servicePerfil;
 
     @PostMapping("/{id}")
-    public ResponseEntity<Perfil> atualizarPerfil(
-            @PathVariable String id,
+    public ResponseEntity<Perfil> atualizarPerfil(@PathVariable String id,
             @RequestBody DadosPerfil dados) {
 
-        try {
             Perfil perfilAtualizado = servicePerfil.atualizarPerfil(id, dados);
             return ResponseEntity.ok(perfilAtualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
     }
 
     @PutMapping("/atualizarfoto/{id}")

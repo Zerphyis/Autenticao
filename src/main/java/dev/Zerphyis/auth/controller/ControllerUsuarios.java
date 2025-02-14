@@ -1,14 +1,18 @@
 package dev.Zerphyis.auth.controller;
 
-import dev.Zerphyis.auth.Dtos.DadosRegistroLogin;
-import dev.Zerphyis.auth.Dtos.DadosSenha;
-import dev.Zerphyis.auth.Dtos.DadosUsuarios;
+import dev.Zerphyis.auth.Dtos.*;
+import dev.Zerphyis.auth.entidades.login.Login;
 import dev.Zerphyis.auth.entidades.registroLogin.RegistroLogin;
+import dev.Zerphyis.auth.repositorios.RepositoryLogin;
+import dev.Zerphyis.auth.segurança.ServiceToken;
 import dev.Zerphyis.auth.service.ServiceRegistroLogin;
 import dev.Zerphyis.auth.service.ServiceUsuarios;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,12 +25,31 @@ public class ControllerUsuarios {
     ServiceUsuarios service;
     @Autowired
     ServiceRegistroLogin serviceLogin;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private ServiceToken tokenService;
 
     @PostMapping("/cadastro")
     public ResponseEntity cadastro(@RequestBody  DadosUsuarios dados){
         service.cadastrarUsuarios(dados);
+
         return ResponseEntity.ok(dados);
+
     }
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody @Valid DadosAutentica data) {
+
+            var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
+            var auth = this.authenticationManager.authenticate(usernamePassword);  // Autentica o usuário
+
+            // Gera o token JWT
+            var token = tokenService.generateToken((Login) auth.getPrincipal());
+            return ResponseEntity.ok(new LoginResposta(token));  // Retorna o token gerado
+        }
+
+
+
     @PutMapping("/atualizar/{id}")
     public ResponseEntity atualizar(@PathVariable String id,@RequestBody DadosUsuarios dados){
         service.atualizarDados(id,dados);
