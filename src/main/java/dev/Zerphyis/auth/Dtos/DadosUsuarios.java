@@ -1,4 +1,4 @@
 package dev.Zerphyis.auth.Dtos;
 
-public record DadosUsuarios(String nome,String senha) {
+public record DadosUsuarios(String nome,String email , String senha) {
 }
