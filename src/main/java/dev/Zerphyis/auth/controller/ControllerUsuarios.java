@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -38,17 +41,20 @@ public class ControllerUsuarios {
 
     }
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid DadosAutentica data) {
+    public ResponseEntity<?> login(@RequestBody DadosAutentica dadosAutentica) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(dadosAutentica.email(), dadosAutentica.senha());
 
-            var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
-            var auth = this.authenticationManager.authenticate(usernamePassword);  // Autentica o usuário
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Gera o token JWT
-            var token = tokenService.generateToken((Login) auth.getPrincipal());
-            return ResponseEntity.ok(new LoginResposta(token));  // Retorna o token gerado
-        }
+        Object principal = authentication.getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
 
+        String token = tokenService.generateToken(username);
 
+        return ResponseEntity.ok(new LoginResposta(token));
+    }
 
     @PutMapping("/atualizar/{id}")
     public ResponseEntity atualizar(@PathVariable String id,@RequestBody DadosUsuarios dados){
@@ -69,12 +75,10 @@ public class ControllerUsuarios {
 
     @GetMapping("/historico/{usuarioId}")
     public ResponseEntity<List<RegistroLogin>> buscarHistorico(@PathVariable String usuarioId) {
-        try {
-            List<RegistroLogin> historico = serviceLogin.buscarHistoricoPorUsuario(usuarioId);
+
+        List<RegistroLogin> historico = serviceLogin.buscarHistoricoPorUsuario(usuarioId);
             return ResponseEntity.ok(historico);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
-        }
+
     }
 
 

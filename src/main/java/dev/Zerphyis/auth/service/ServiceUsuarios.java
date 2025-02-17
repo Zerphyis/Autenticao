@@ -1,19 +1,35 @@
 package dev.Zerphyis.auth.service;
 
 import dev.Zerphyis.auth.Dtos.DadosUsuarios;
+import dev.Zerphyis.auth.entidades.login.Login;
 import dev.Zerphyis.auth.entidades.usuarios.Usuarios;
+import dev.Zerphyis.auth.repositorios.RepositoryLogin;
 import dev.Zerphyis.auth.repositorios.RepositoryUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ServiceUsuarios {
     @Autowired
     RepositoryUsuarios repository;
+    @Autowired
+    private RepositoryLogin repositoryLogin;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     public Usuarios cadastrarUsuarios(DadosUsuarios dados){
         var novoUsuario= new Usuarios(dados);
+
+        String senhaCriptografada = passwordEncoder.encode(dados.senha());
+
+        Login novologin = new Login();
+        novologin.setEmail(dados.email());
+        novologin.setSenha(senhaCriptografada);
+
+        repositoryLogin.save(novologin);
        return repository.save(novoUsuario);
     }
 
