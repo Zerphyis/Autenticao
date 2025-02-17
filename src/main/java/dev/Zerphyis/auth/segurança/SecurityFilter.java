@@ -23,19 +23,32 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+      String requestURI = request.getRequestURI();
+
+        // Não aplica o filtro nas rotas de cadastro e login
+        if (requestURI.equals("/auth/cadastro") || requestURI.equals("/auth/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Recupera o token
         var token = recoverToken(request);
         if (token != null) {
-            var login = tokenService.validateToken(token);  // Validação do token
+            // Valida o token e recupera o login (e.g., email)
+            String login = tokenService.validateToken(token);
 
-            // Se o token for válido, obtém o usuário
             if (login != null) {
+                // Recupera o usuário com base no email (login)
                 UserDetails user = repository.findByEmail(login);
                 if (user != null) {
+                    // Cria um token de autenticação e define no SecurityContextHolder
                     var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);  // Adiciona autenticação no contexto
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         }
+
+        // Continua o filtro
         filterChain.doFilter(request, response);
     }
 
