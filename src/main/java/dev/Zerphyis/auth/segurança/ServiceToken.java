@@ -18,12 +18,12 @@ public class ServiceToken {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateToken(Login login){
+    public String generateToken(String username){
         try{
             Algorithm algoritimo = Algorithm.HMAC256(secret);
             String token = JWT.create()
                     .withIssuer("auth")
-                    .withSubject(login.getUsername())
+                    .withSubject(username)
                     .withExpiresAt(genExpirationDate())
                     .sign(algoritimo);
             return token;
